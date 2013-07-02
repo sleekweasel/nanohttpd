@@ -38,7 +38,7 @@
 <a name="core-features" class="anchor" href="#core-features"><span class="octicon octicon-link"></span></a>Core Features</h2>
 
 <ul>
-<li>Only one Java file.</li>
+<li>Only one Java file, providing HTTP 1.1 support.</li>
 <li>2 "flavors" - one at "current" standards and one strictly Java 1.1 compatible.</li>
 <li>Released as open source, free software, under a Modified BSD licence.</li>
 <li>No fixed config files, logging, authorization etc. (Implement by yourself if you need them.)</li>
@@ -52,6 +52,7 @@
 <li>All header names are converted lowercase so they don't vary between browsers/clients.</li>
 <li>Very low memory overhead when processing even the largest of requests.</li>
 <li>Temp file usage and threading model are easily cutomized.</li>
+<li>Persistent connections (Connection "keep-alive") support allowing multiple requests to be served over a single socket connection.</li>
 </ul><h2>
 <a name="webserver-features" class="anchor" href="#webserver-features"><span class="octicon octicon-link"></span></a>Webserver Features</h2>
 
@@ -68,7 +69,20 @@
 </ul><h2>
 <a name="how-is-the-project-managed" class="anchor" href="#how-is-the-project-managed"><span class="octicon octicon-link"></span></a>How is the project managed?</h2>
 
-<p>The project is managed with a "fork and pull-request" pattern.  If you want to contribute, fork this repo and submit a pull-request of your changes when you're ready.  Anyone can create Issues, and pull requests should be tied back to an issue describing the purpose of the submitted code.</p>
+<p>The project is managed with a "fork and pull-request" pattern.</p>
+
+<p>If you want to contribute, fork this repo and submit a pull-request of your changes when you're ready.</p>
+
+<p>Anyone can create Issues, and pull requests should be tied back to an issue describing the purpose of the submitted code.</p>
+
+<h2>
+<a name="the-tests" class="anchor" href="#the-tests"><span class="octicon octicon-link"></span></a>The Tests</h2>
+
+<p>In an ideal world for a bug fix: write a test of your own that fails as a result of the bug being present.  Then fix the bug so that your unit-test passes.  The test will now be a guard against the bug ever coming back.</p>
+
+<p>Similarly for enhancements, exercise your code with tests.</p>
+
+<p>Whatever else happens, if you make changes to the code, the unit &amp; integration test suite (under <code>core/src/main/test/</code>) should all continue to function.  Pull requests with broken tests will be rejected.</p>
 
 <h2>
 <a name="where-can-i-find-the-original-java11-nanohttpd" class="anchor" href="#where-can-i-find-the-original-java11-nanohttpd"><span class="octicon octicon-link"></span></a>Where can I find the original (Java1.1) NanoHttpd?</h2>
@@ -143,10 +157,14 @@ the samples from the runtime JAR to further slim it down.</p>
 <p>The two projects pooled resources in early 2013, merging code-bases, to better support the
 user base and reduce confusion over why <em>two</em> NanoHttpd projects existed.</p>
 
+<p><a href="http://nanohttpd.com">http://nanohttpd.com</a> - went live July 1st, 2013.</p>
+
 <h2>
 <a name="version-history-java-6-version" class="anchor" href="#version-history-java-6-version"><span class="octicon octicon-link"></span></a>Version History (Java 6+ version)</h2>
 
 <ul>
+<li>2.0.3 (2013-06-17) : Implemented 'Connection: keep-alive', (tested against latest Mozilla Firefox).</li>
+<li>2.0.2 (2013-06-06) : Polish for the webserver, and fixed a bug causing stack-traces on Samsung Phones.</li>
 <li>2.0.1 (2013-05-27) : Non-English UTF-8 decoding support for URLS/Filenames</li>
 <li>2.0.0 (2013-05-21) : Released - announced on FreeCode.com</li>
 <li>(2013-05-20) : Test suite looks complete.</li>
