@@ -151,7 +151,7 @@ public abstract class NanoHTTPD {
                                     try {
                                         outputStream = finalAccept.getOutputStream();
                                         TempFileManager tempFileManager = tempFileManagerFactory.create();
-                                        HTTPSession session = new HTTPSession(tempFileManager, inputStream, outputStream);
+                                        ParsingHTTPSession session = new ParsingHTTPSession(tempFileManager, inputStream, outputStream);
                                         while (!finalAccept.isClosed()) {
                                             session.execute();
                                         }
@@ -712,8 +712,36 @@ public abstract class NanoHTTPD {
     /**
      * Handles one session, i.e. parses the HTTP request and returns the response.
      */
-    protected class HTTPSession {
-        public static final int BUFSIZE = 8192;
+    public interface HTTPSession {
+        void execute() throws IOException;
+
+        Map<String, String> getParms();
+
+        Map<String, String> getHeaders();
+
+        String getPath();
+
+        /**
+         * @return The path of the URL, e.g. '/path/of/request'.
+         */
+        @Deprecated
+        String getUri();
+
+        Method getMethod();
+
+        InputStream getInputStream();
+
+        CookieHandler getCookies();
+
+        /**
+         * Modify files to represent files in request body; instead of a getFiles().
+         */
+        void parseBody(Map<String, String> files) throws IOException, ResponseException;
+    }
+
+    protected class ParsingHTTPSession implements HTTPSession {
+        int BUFSIZE = 8192;
+
         private final TempFileManager tempFileManager;
         private final OutputStream outputStream;
         private InputStream inputStream;
@@ -725,12 +753,13 @@ public abstract class NanoHTTPD {
         private Map<String, String> headers;
         private CookieHandler cookies;
 
-        public HTTPSession(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
+        public ParsingHTTPSession(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
             this.tempFileManager = tempFileManager;
             this.inputStream = inputStream;
             this.outputStream = outputStream;
         }
 
+        @Override
         public void execute() throws IOException {
             try {
                 // Read the first 8192 bytes.
@@ -805,7 +834,8 @@ public abstract class NanoHTTPD {
             }
         }
 
-        protected void parseBody(Map<String, String> files) throws IOException, ResponseException {
+        @Override
+        public void parseBody(Map<String, String> files) throws IOException, ResponseException {
             RandomAccessFile randomAccessFile = null;
             BufferedReader in = null;
             try {
@@ -1131,26 +1161,38 @@ public abstract class NanoHTTPD {
             }
         }
 
+        @Override
         public final Map<String, String> getParms() {
             return parms;
         }
 
+        @Override
         public final Map<String, String> getHeaders() {
             return headers;
         }
 
+        @Override
+        public final String getPath() {
+            return uri;
+        }
+
+        @Override
+        @Deprecated
         public final String getUri() {
             return uri;
         }
 
+        @Override
         public final Method getMethod() {
             return method;
         }
 
+        @Override
         public final InputStream getInputStream() {
             return inputStream;
         }
 
+        @Override
         public CookieHandler getCookies() {
             return cookies;
         }
