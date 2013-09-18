@@ -61,10 +61,6 @@ public abstract class NanoHTTPD {
      */
     public static final String MIME_HTML = "text/html";
     /**
-     * Common mime type for dynamic content: binary
-     */
-    public static final String MIME_DEFAULT_BINARY = "application/octet-stream";
-    /**
      * Pseudo-Parameter to use to store the actual query string in the parameters map for later re-processing.
      */
     private static final String QUERY_STRING_PARAMETER = "NanoHttpd.QUERY_STRING";
@@ -503,6 +499,10 @@ public abstract class NanoHTTPD {
          * The request method that spawned this response.
          */
         private Method requestMethod;
+        /**
+         * Use chunkedTransfer
+         */
+        private boolean chunkedTransfer;
 
         /**
          * Default constructor: response = HTTP_OK, mime = MIME_HTML and your supplied message
@@ -572,7 +572,7 @@ public abstract class NanoHTTPD {
 
                 pw.print("Connection: keep-alive\r\n");
 
-                if (requestMethod != Method.HEAD && data instanceof PipedInputStream) {
+                if (requestMethod != Method.HEAD && chunkedTransfer) {
                     sendAsChunked(outputStream, pw);
                 } else {
                     sendAsFixedLength(outputStream, pw);
@@ -652,6 +652,10 @@ public abstract class NanoHTTPD {
 
         public void setRequestMethod(Method requestMethod) {
             this.requestMethod = requestMethod;
+        }
+
+        public void setChunkedTransfer(boolean chunkedTransfer) {
+            this.chunkedTransfer = chunkedTransfer;
         }
 
         /**
@@ -892,7 +896,7 @@ public abstract class NanoHTTPD {
                         String boundaryStartString = "boundary=";
                         int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
                         String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
-                        if (boundary.startsWith("\"") && boundary.startsWith("\"")) {
+                        if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
                             boundary = boundary.substring(1, boundary.length() - 1);
                         }
 
