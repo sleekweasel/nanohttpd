@@ -58,7 +58,7 @@ public class HttpServerTest {
 
     protected ByteArrayOutputStream invokeServer(InputStream inputStream) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        NanoHTTPD.ParsingHTTPSession session = testServer.createSession(tempFileManager, inputStream, outputStream);
+        NanoHTTPD.HTTPSession session = testServer.createSession(tempFileManager, inputStream, outputStream);
         try {
             session.execute();
         } catch (IOException e) {
@@ -110,8 +110,8 @@ public class HttpServerTest {
             super(8192);
         }
 
-        public ParsingHTTPSession createSession(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
-            return new ParsingHTTPSession(tempFileManager, inputStream, outputStream);
+        public HTTPSession createSession(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
+            return new HTTPSession(tempFileManager, inputStream, outputStream);
         }
 
         @Override
